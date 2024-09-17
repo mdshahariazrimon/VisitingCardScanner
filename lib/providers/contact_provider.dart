@@ -1,5 +1,18 @@
 import 'package:flutter/foundation.dart';
+import 'package:visiting_card/db/dbhelper.dart';
+import 'package:visiting_card/models/contact_model.dart';
 
 class ContactProvider extends ChangeNotifier{
+  List<ContactModel> contactlist=[];
+  final db=Dbhelper();
 
+  Future<int> insertContact(ContactModel contactModel) async{
+    final rowId= await db.insertContact(contactModel);
+    return rowId;
+  }
+
+  Future<void> getAllContacts() async{
+    contactlist= await db.getAllContacts();
+    notifyListeners();
+  }
 }
