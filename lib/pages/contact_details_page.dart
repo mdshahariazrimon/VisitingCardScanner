@@ -67,7 +67,7 @@ class _ContactDetailsPageState extends State<ContactDetailsPage> {
                       children: [
                         IconButton(
                           onPressed: (){
-                            _smsContact(contact.email);
+                            _emailContact(contact.email);
                           },
                           icon: const Icon(Icons.email),
                         ),
@@ -75,13 +75,13 @@ class _ContactDetailsPageState extends State<ContactDetailsPage> {
                     ),
                   ),
                   ListTile(
-                    title: Text(contact.address.isEmpty?'No Data':contact.email),
+                    title: Text(contact.address.isEmpty?'No Data':contact.address),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           onPressed: (){
-                            _smsContact(contact.address);
+                            _locationContact(contact.address);
                           },
                           icon: const Icon(Icons.map),
                         ),
@@ -89,13 +89,13 @@ class _ContactDetailsPageState extends State<ContactDetailsPage> {
                     ),
                   ),
                   ListTile(
-                    title: Text(contact.website.isEmpty?'No Data':contact.email),
+                    title: Text(contact.website.isEmpty?'No Data':contact.website),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           onPressed: (){
-                            _smsContact(contact.website);
+                            _webContact(contact.website);
                           },
                           icon: const Icon(Icons.web),
                         ),
@@ -132,6 +132,37 @@ class _ContactDetailsPageState extends State<ContactDetailsPage> {
     }
     else{
     showMsg(context, 'Can not perform this task');
+    }
+  }
+
+  // Method to open the email app with the contact's email address
+  void _emailContact(String email) async {
+    final url = 'mailto:$email'; // mailto URL scheme for emails
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(url);
+    } else {
+      showMsg(context, 'Cannot perform this task');
+    }
+  }
+
+// Method to open the map app with the contact's address
+  void _locationContact(String address) async {
+    final query = Uri.encodeComponent(address); // Encode the address
+    final url = 'geo:0,0?q=$query'; // geo URL scheme for maps
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(url);
+    } else {
+      showMsg(context, 'Cannot perform this task');
+    }
+  }
+
+// Method to open the browser with the contact's website
+  void _webContact(String website) async {
+    final url = website.startsWith('http') ? website : 'http://$website'; // Ensure URL is valid
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(url);
+    } else {
+      showMsg(context, 'Cannot perform this task');
     }
   }
 }
