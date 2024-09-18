@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visiting_card/pages/form_page.dart';
 import 'package:visiting_card/providers/contact_provider.dart';
+import 'package:visiting_card/utils/helpers.dart';
 
 class HomePage extends StatefulWidget {
   static const String routename='/';
@@ -75,11 +76,26 @@ class _HomePageState extends State<HomePage> {
             itemCount: provider.contactlist.length,
             itemBuilder: (context, index) {
               final contact= provider.contactlist[index];
-              return ListTile(
-                title: Text(contact.name),
-                trailing: IconButton(
-                  onPressed: (){},
-                  icon: Icon(contact.favourite? Icons.favorite: Icons.favorite_border),
+              return Dismissible(
+                key: UniqueKey(),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  padding: const EdgeInsets.only(right: 20),
+                  alignment: FractionalOffset.centerRight,
+                  color: Colors.red,
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                confirmDismiss: _showConfirmationDialog,
+                onDismissed: (direction) async{
+                  await provider.deleteContact(contact.id);
+                  showMsg(context, 'Deleted');
+                },
+                child: ListTile(
+                  title: Text(contact.name),
+                  trailing: IconButton(
+                    onPressed: (){},
+                    icon: Icon(contact.favourite? Icons.favorite: Icons.favorite_border),
+                  ),
                 ),
               );
             },
@@ -87,5 +103,26 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  Future<bool?> _showConfirmationDialog(DismissDirection direction) {
+    return showDialog(context: context, builder: (context)=>AlertDialog(
+      title: const Text('Delete Contact'),
+      content: const Text('Are you sure to delete this contact?'),
+      actions: [
+        OutlinedButton(
+          onPressed: (){
+            Navigator.pop(context,false);
+          },
+          child: const Text('NO'),
+        ),
+        OutlinedButton(
+          onPressed: (){
+            Navigator.pop(context,true);
+          },
+          child: const Text('YES'),
+        )
+      ],
+    ));
   }
 }

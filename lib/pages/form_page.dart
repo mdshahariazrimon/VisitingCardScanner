@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visiting_card/models/contact_model.dart';
 import 'package:visiting_card/providers/contact_provider.dart';
+import 'package:visiting_card/utils/helpers.dart';
 
 class FormPage extends StatefulWidget {
   static const String routename='/form';
@@ -163,6 +164,7 @@ class _FormPageState extends State<FormPage> {
           .then((rowId){
         if(rowId>0)
         {
+          showMsg(context, 'Saved');
           Navigator.pop(context);
         }
       });

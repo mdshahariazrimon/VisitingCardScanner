@@ -31,4 +31,9 @@ class Dbhelper{
     final mapList =await db.query(tableContact);
     return List.generate(mapList.length, (index) => ContactModel.formMap(mapList[index]));
   }
+
+  Future<int> deleteContact(int id) async{
+    final db= await _open();
+    return db.delete(tableContact, where: '$tblContactColId= ?', whereArgs: []);
+  }
 }
