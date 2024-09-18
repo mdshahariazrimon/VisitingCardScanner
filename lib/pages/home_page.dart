@@ -85,6 +85,7 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.red,
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
+
                 confirmDismiss: _showConfirmationDialog,
                 onDismissed: (direction) async{
                   await provider.deleteContact(contact.id);
@@ -93,7 +94,10 @@ class _HomePageState extends State<HomePage> {
                 child: ListTile(
                   title: Text(contact.name),
                   trailing: IconButton(
-                    onPressed: (){},
+                    onPressed: (){
+                      contact.favourite=!contact.favourite;
+                      provider.updateContactField(contact);
+                    },
                     icon: Icon(contact.favourite? Icons.favorite: Icons.favorite_border),
                   ),
                 ),
