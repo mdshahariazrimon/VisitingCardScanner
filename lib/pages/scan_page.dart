@@ -43,6 +43,9 @@ class _ScanPageState extends State<ScanPage> {
                 label: const Text('Gallery'),
               )
             ],
+          ),
+          Wrap(
+            children: lines.map((line)=> Chip(label: Text(line),)).toList(),
           )
         ],
       ) ,
