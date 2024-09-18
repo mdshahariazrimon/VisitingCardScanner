@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:visiting_card/models/contact_model.dart';
 import 'package:visiting_card/pages/form_page.dart';
 import 'package:visiting_card/providers/contact_provider.dart';
 import 'package:visiting_card/utils/helpers.dart';
@@ -91,12 +92,12 @@ class _HomePageState extends State<HomePage> {
                   await provider.deleteContact(contact.id);
                   showMsg(context, 'Deleted');
                 },
+                //favourite
                 child: ListTile(
                   title: Text(contact.name),
                   trailing: IconButton(
                     onPressed: (){
-                      contact.favourite=!contact.favourite;
-                      provider.updateContactField(contact);
+                      provider.updateContactField(contact,tblContactColFavourite);
                     },
                     icon: Icon(contact.favourite? Icons.favorite: Icons.favorite_border),
                   ),
