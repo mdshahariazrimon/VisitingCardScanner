@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visiting_card/models/contact_model.dart';
+import 'package:visiting_card/pages/contact_details_page.dart';
 import 'package:visiting_card/pages/form_page.dart';
 import 'package:visiting_card/providers/contact_provider.dart';
 import 'package:visiting_card/utils/helpers.dart';
@@ -94,6 +95,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 //favourite
                 child: ListTile(
+                  onTap: ()=> Navigator.pushNamed(context, ContactDetailsPage.routename,arguments: contact.id),
                   title: Text(contact.name),
                   trailing: IconButton(
                     onPressed: (){
