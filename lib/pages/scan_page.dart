@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:visiting_card/models/contact_model.dart';
+import 'package:visiting_card/pages/form_page.dart';
+import 'package:visiting_card/utils/constants.dart';
 
 class ScanPage extends StatefulWidget {
   static const String routename='/scan';
@@ -21,6 +24,12 @@ class _ScanPageState extends State<ScanPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Scan Page'),
+        actions: [
+          TextButton(
+            onPressed:image.isEmpty?null: _createContactModelFromScannedValues,
+            child: const Text('Next'),
+          )
+        ],
 
       ),
       body:ListView(
@@ -44,8 +53,31 @@ class _ScanPageState extends State<ScanPage> {
               )
             ],
           ),
+          if(isScanOver) Card(
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                children: [
+                  DropTargetItem(property: ContactProperties.name, onDrop: _getPropertyValue),
+                  DropTargetItem(property: ContactProperties.mobile, onDrop: _getPropertyValue),
+                  DropTargetItem(property: ContactProperties.email, onDrop: _getPropertyValue),
+                  DropTargetItem(property: ContactProperties.addreess, onDrop: _getPropertyValue),
+                  DropTargetItem(property: ContactProperties.company, onDrop: _getPropertyValue),
+                  DropTargetItem(property: ContactProperties.designation, onDrop: _getPropertyValue),
+                  DropTargetItem(property: ContactProperties.website, onDrop: _getPropertyValue),
+                ],
+              ),
+            ),
+          ),
+
+          if(isScanOver) const Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(dragInstruction)
+          ),
+
           Wrap(
-            children: lines.map((line)=> Chip(label: Text(line),)).toList(),
+            children: lines.map((line)=> LineItem(line: line)).toList(),
           )
         ],
       ) ,
@@ -72,4 +104,126 @@ class _ScanPageState extends State<ScanPage> {
         });
       }
   }
+
+  _getPropertyValue(String property, String value) {
+    switch(property){
+      case ContactProperties.name:
+        name=value;
+        break;
+      case ContactProperties.mobile:
+        mobile=value;
+        break;
+      case ContactProperties.email:
+        email=value;
+        break;
+      case ContactProperties.addreess:
+        address=value;
+        break;
+      case ContactProperties.company:
+        company=value;
+        break;
+      case ContactProperties.designation:
+        designation=value;
+        break;
+      case ContactProperties.website:
+        website=value;
+        break;
+    }
+  }
+
+  void _createContactModelFromScannedValues() {
+    final contact = ContactModel(
+      name: name,
+      mobile: mobile,
+      email: email,
+      address: address,
+      company: company,
+      designation: designation,
+      website: website,
+      image: image,
+    );
+    Navigator.pushNamed(context, FormPage.routename,arguments: contact);
+  }
 }
+
+class DropTargetItem extends StatefulWidget {
+  final String property;
+  final Function(String, String) onDrop;
+  const DropTargetItem({super.key,required this.property, required this.onDrop});
+
+  @override
+  State<DropTargetItem> createState() => _DropTargetItemState();
+}
+
+class _DropTargetItemState extends State<DropTargetItem> {
+  String dragItem='';
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(flex:1,child: Text(widget.property)),
+        Expanded(
+          flex: 2,
+          child: DragTarget<String>(
+            builder: (context, candidateData, rejectedData)=> Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                border: candidateData.isNotEmpty? Border.all(color: Colors.red,width: 2):null,
+              ),
+              child: Row(
+                children: [
+                  Expanded(child: Text(dragItem.isEmpty?'Drop Here': dragItem)),
+                  if(dragItem.isNotEmpty)
+                    InkWell(
+                      onTap: (){
+                        setState(() {
+                          dragItem='';
+                        });
+                      },
+                        child:const Icon(Icons.clear,size: 15,))
+                ],
+              ),
+            ),
+            onAccept:(value){
+              setState(() {
+                if(dragItem.isEmpty){
+                  dragItem=value;
+                }
+                else{
+                  dragItem+=' $value';
+                }
+              });
+              widget.onDrop(widget.property, dragItem);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+class LineItem extends StatelessWidget {
+  final String line;
+  const LineItem({super.key, required this.line});
+
+  @override
+  Widget build(BuildContext context) {
+    final GlobalKey _globalKey= GlobalKey();
+    return LongPressDraggable(
+      data: line,
+      dragAnchorStrategy: childDragAnchorStrategy,
+      feedback: Container(
+        key: _globalKey,
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black45,
+        ),
+        child: Text(line,style: Theme.of(context)
+            .textTheme.titleMedium!.copyWith(color: Colors.white),),
+      ),
+      child: Chip(label: Text(line),),
+    );
+  }
+}
+
